@@ -91,14 +91,11 @@ return rec(
 	  );
 end);
 
-
-
-
 ###
 InstallGlobalFunction(
 ConfigurationSpaceChar,
  function ( group, n, dim, Vchar, sigma )
-    local  tg, characters, phi, SG;
+    local  tg, characters, phi, SG, nc_sg, tv_sg, res, sigmachar, k, tensored_char, single;
     tg := CharacterTable( group );
     SG := SymmetricGroup( n );
     sigmachar:= RestrictedClassFunctions( [ NaturalCharacter( SG ) - TrivialCharacter( SG ) ], sigma )[1] ; 
