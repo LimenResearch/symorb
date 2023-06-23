@@ -15,6 +15,7 @@ import os
 import time
 import pickle
 import copy
+import yaml
 
 __all__ = ["minpath", "scan_files"]
 
@@ -178,7 +179,7 @@ class minpath:
         fd.close()
     # def relax(self,ALG, *args):
 
-    def relax(*args):
+    def relax(*args, yaml_path=None):
         if len(args) == 1:
             print(args[0].algs)
             return
@@ -207,6 +208,13 @@ class minpath:
         # self.gammadata=_minorb_bin(alldata)
         self.parsegammadata()
         print(" ==> action: %8.4f; howsol: %8.4e" % (self.action(), self.howsol()))
+        if os.path.isfile(yaml_path):
+            with open(yaml_path, "r+") as f:
+                 y = yaml.load(f, Loader=yaml.FullLoader)
+                 y["optimization_method"] = ALG
+                 yaml.dump(y, f)
+            
+            
 
     def newton(self, ALG):
         if (ALG / 100) == 0:
@@ -274,7 +282,9 @@ class minpath:
             return "<minpath object; invalid>"
             del self
         else:
-            return "<minpath object; NOB=%i, dim=%i, steps=%i>" % (self.NOB, self.dim, self.steps)
+            return "<minpath object; NOB=%i, dim=%i, steps=%i>" % (self.NOB,
+                                                                   self.dim,
+                                                                   self.steps)
 
     def __str__(self):
         return repr(self)
