@@ -87,6 +87,15 @@ return result;
 end);
 
 
+
+## python float conversion
+
+## CHANGES MADE (ALSO IN THE NC FUNCTION BELOW)
+## "string.replace" changed with "str.replace"
+## `var.real` changed with str(var.real)
+## `var.imag` changed with str(var.imag)
+## these two changes made digits appear in the .sym file
+
 InstallGlobalFunction(ConvertToFloat,
 function (var)
 local str,filename,python_script, exec_program, a, tmpstring;
@@ -108,6 +117,25 @@ if var.imag != 0:\n\
         sys.stdout.write( \"  !!! imag= \" + str(var.imag) )\n\
 \n\
 ";
+
+# python_script:= "\
+# import sys,math,cmath,string\n\
+# \n\
+# def E(n):\n\
+#         return cmath.exp(1.0j / float(n) * 2.0 * cmath.pi)\n\
+# \n\
+# \n\
+# tmpstring = sys.argv[1]\n\
+# tmpstring = string.replace(tmpstring,\"^\",\"**\")\n\
+# tmpstring = string.replace(tmpstring,\"/\",\"* 1.0 /\")\n\
+# ## sys.stdout.write(tmpstring)\n\
+# var = eval(tmpstring)+0J \n\
+# \n\
+# sys.stdout.write(`var.real`+'D0')\n\
+# if var.imag != 0:\n\
+#         sys.stdout.write( \"  !!! imag= \" + `var.imag` )\n\
+# \n\
+# ";
 
 
 exec_program := Filename( DirectoriesSystemPrograms(), "python3" );
@@ -140,6 +168,22 @@ var = eval(tmpstring)+0J \n\
 \n\
 sys.stdout.write(str(var.real))\n\
 ";
+
+# python_script:= "\
+# import sys,math,cmath,string\n\
+# \n\
+# def E(n):\n\
+#         return cmath.exp(1.0j / float(n) * 2.0 * cmath.pi)\n\
+# \n\
+# \n\
+# tmpstring = sys.argv[1]\n\
+# tmpstring = string.replace(tmpstring,\"^\",\"**\")\n\
+# tmpstring = string.replace(tmpstring,\"/\",\"* 1.0 /\")\n\
+# ## sys.stdout.write(tmpstring)\n\
+# var = eval(tmpstring)+0J \n\
+# \n\
+# sys.stdout.write(`var.real`)\n\
+# ";
 
 exec_program := Filename( DirectoriesSystemPrograms(), "python3" );
 str := ""; a := OutputTextString(str,true);
