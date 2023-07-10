@@ -6,6 +6,7 @@ module mod_potential
 contains
   
 function potential(conf)
+! computes the potential U on a fixed configuration x (conf)
 implicit none
 real(precis), dimension (NOB,dim), intent(IN) :: conf
 real(precis) :: potential, distanza
@@ -22,6 +23,7 @@ end function potential
 
 
 function grad_potential(conf)
+! computes the gradient of U on a fixed configuration x (conf)
 implicit none
 real(precis), dimension (NOB,dim) :: conf, grad_potential
 real(precis) :: distanza
@@ -38,7 +40,6 @@ end do
 
 return
 end function grad_potential
-
 
 
 function grad2_potential(conf)
@@ -86,10 +87,6 @@ end function grad2_potential
 
 
 
-
-
-
-
 function UU_var(mygamma)
     implicit none
     real(precis), dimension (NOB,dim,0:steps+1), intent(IN) :: mygamma
@@ -101,6 +98,9 @@ function UU_var(mygamma)
 end function UU_var
 
 function UU(mygamma)
+! here we compute the integral of the potential U along a path which connects mygamma(:,:,0) to
+! mygamma(:,:,steps+1), where the path is obtained as the sum of a segment plus a Fourier series.
+! note that the integral is computed as Riemann sums
 implicit none
 real(precis), dimension (NOB,dim,0:steps+1), intent(IN) :: mygamma
 real(precis)  ::  UU, tempo
@@ -109,22 +109,25 @@ integer :: h,k
 UU=0.0d0
 
 do h=1,NOP 
-tempo=real(h,precis) * pi  / real(NOP+1,precis) 
-	thisconf=mygamma(:,:,0) + (mygamma(:,:,steps+1) - mygamma(:,:,0))* tempo / pi 
+tempo=real(h,precis) * pi  / real(NOP+1,precis) ! it seems that pi is useless here
+	thisconf=mygamma(:,:,0) + (mygamma(:,:,steps+1) - mygamma(:,:,0))* tempo / pi ! this is why
+	! above, we construct a segment connecting mygamma(:,:,0) to mygamma(:,:,steps+1)
 	do k=1,steps
-		thisconf(:,:)=thisconf(:,:)+mygamma(:,:,k)*sin_kth(k,h)
+		thisconf(:,:)=thisconf(:,:)+mygamma(:,:,k)*sin_kth(k,h) 
+		! above, we add a Fourier series to the segment
 	end do
 	UU=UU+potential(thisconf)
 end do
 
 UU = UU + 0.5d0 * ( potential(mygamma(:,:,0)) + potential(mygamma(:,:,steps+1)))
 
-UU=UU * pi / real(NOP+1,precis) 
+UU=UU * pi / real(NOP+1,precis) ! this is the integral of U times pi, which seems to be wrong
 return
 end function UU
 
 
 function grad_UU(mygamma)
+! same as UU, we compute the integral of the gradient of the potential U
 implicit none
 real(precis), dimension (NOB,dim,0:steps+1), intent(IN) :: mygamma
 real(precis), dimension(NOB,dim,0:steps+1) :: grad_UU 
@@ -136,8 +139,8 @@ thisconf=0.0d0
 gradconf=0.0d0
 
 do h=1,NOP
-	tempo=real(h,precis) * pi  / real(NOP+1,precis) 
-	thisconf=mygamma(:,:,0) + (mygamma(:,:,steps+1) - mygamma(:,:,0))* tempo / pi 
+	tempo=real(h,precis) * pi  / real(NOP+1,precis) ! again, pi is not needed here
+	thisconf=mygamma(:,:,0) + (mygamma(:,:,steps+1) - mygamma(:,:,0))* tempo / pi ! this is why
 	do k=1,steps
 		thisconf(:,:)=thisconf(:,:)+mygamma(:,:,k)*sin_kth(k,h)
 	end do
