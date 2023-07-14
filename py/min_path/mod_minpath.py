@@ -107,11 +107,11 @@ class minpath:
         self.withcoll = 0
         self.confdata = ""
         self.viewfile = ""
-        headers = string.split(_strip_comments(self.symdata), '\n')[0:3]
+        headers = _strip_comments(self.symdata).split('\n')[0:3]
         for i in range(len(headers)):
             headers[i] = re.compile(r"^ *").sub('', headers[i])
-        self.NOB = string.atoi(string.split(headers[1], ' ')[0])
-        self.dim = string.atoi(string.split(headers[2], ' ')[0])
+        self.NOB = int(headers[1].split(' ')[0])
+        self.dim = int(headers[2].split(' ')[0])
         self.masses = list(range(self.NOB))
         self.massdata = ""
         for i in range(self.NOB):
@@ -179,7 +179,7 @@ class minpath:
         fd.close()
     # def relax(self,ALG, *args):
 
-    def relax(*args, yaml_path=None):
+    def relax(*args, **kwargs):
         if len(args) == 1:
             print(args[0].algs)
             return
@@ -208,7 +208,8 @@ class minpath:
         # self.gammadata=_minorb_bin(alldata)
         self.parsegammadata()
         print(" ==> action: %8.4f; howsol: %8.4e" % (self.action(), self.howsol()))
-        if os.path.isfile(yaml_path):
+        yaml_path = kwargs.get("yaml_path", None)
+        if yaml_path is not None and os.path.isfile(yaml_path):
             with open(yaml_path, "r+") as f:
                  y = yaml.load(f, Loader=yaml.FullLoader)
                  y["optimization_method"] = ALG
@@ -347,9 +348,9 @@ class minpath:
         alldata = self.confdata + self.symdata + \
             self.massdata + _endofchunk + self.gammadata
         if self.withcoll:
-            tmpvar = string.atof(_minorb_bin_withcoll(alldata))
+            tmpvar = float(_minorb_bin_withcoll(alldata))
         else:
-            tmpvar = string.atof(_minorb_bin(alldata))
+            tmpvar = float(_minorb_bin(alldata))
         # tmpvar=string.atof(_minorb_bin(alldata))
         self.a = tmpvar
         return tmpvar
@@ -372,17 +373,17 @@ class minpath:
         alldata = self.confdata + self.symdata + \
             self.massdata + _endofchunk+self.gammadata
         if self.withcoll:
-            tmpvar = string.atof(_minorb_bin_withcoll(alldata))
+            tmpvar = float(_minorb_bin_withcoll(alldata))
         else:
-            tmpvar = string.atof(_minorb_bin(alldata))
-        # tmpvar = string.atof(_minorb_bin(alldata))
+            tmpvar = float(_minorb_bin(alldata))
+        # tmpvar = float(_minorb_bin(alldata))
         self.h = tmpvar
         return tmpvar
 
     def info(self):
         str = self.symfilename
         # tmp=(string.split(str,os.sep))[-1]
-        basename = string.join(string.split(str, '.')[0:-1], '.')
+        basename = ('.').join(str.split('.')[0:-1])
         sys.stdout.write("info on " + basename + ":\n")
         sys.stdout.write(
             "----------------------------------------------------------------\n")
@@ -443,16 +444,19 @@ class minpath:
         headers = alllines[0:3]
         for i in range(len(headers)):
             headers[i] = re.compile(r"^ *").sub('', headers[i])
-        tmp = string.split(headers[0], ' ')[0:3]
+        tmp = headers[0].split(' ')[0:3]
         # self.NOB=string.atoi(tmp[0])
         # self.dim=string.atoi(tmp[1])
         # self.steps=string.atoi(tmp[2])
-        tmp = string.split(headers[1], ' ')[0:3]
+        tmp = headers[1].split(' ')[0:3]
         self.omega = [0.0, 0.0, 0.0]
+        
         for i in range(3):
-            self.omega[i] = string.atof(tmp[i])
-        tmp = string.split(headers[2], ' ')[0]
-        self.ALPHA = string.atof(tmp)
+            
+            self.omega[i] = float(tmp[i])
+        
+        tmp = headers[2].split(' ')[0]
+        self.ALPHA = float(tmp)
         float_regex = '[-+]?(?:\d+(?:\.\d*)?|\d*\.\d+)(?:[eE][-+]?\d+)?'
         numline_regex = ' *' + ' +'.join(["(%s)" % float_regex]*self.dim)
         # self.omega = map(float, re.match(" *(%s) +(%s) +(%s)" % (float_regex,float_regex,float_regex),alllines[1] ).groups())

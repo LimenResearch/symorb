@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7 -i
+#!/home/gcanneor/mybin/norbit/norbit_env/bin/python -i
 
 r"""
 minpath Class:
@@ -10,7 +10,7 @@ import os
 if 'SYMORBDIR' in os.environ:
   DISTDIR=os.environ['SYMORBDIR']
 else:
-  DISTDIR=os.environ['HOME'] + "/local/symorb"
+  DISTDIR=os.environ['HOME'] + "/symorb_git"
 
 import sys
 sys.path=sys.path+[DISTDIR + '/py']
@@ -44,21 +44,21 @@ def set_up_remote_service(host):
  # make the tunnel...
  # PP=subprocess.Popen("ssh -f -L %s:localhost:%s %s -N" % (RemoteServer_porta,RemoteServer_porta,host) , shell=True,bufsize=8192,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True )
  if os.uname()[1] != host :
-  print  "tunneling..."
+  print("tunneling...")
   os.system("ssh -f -L %s:localhost:%s %s -N" % (RemoteServer_porta,RemoteServer_porta,host))
 
 
 def interactive():
-	global SharedToken, RemoteServer_porta
-	if REMOTE_MINORB:
-         print "setting up remote service..."
-	 set_up_remote_service('lkl01')
-	# change interactively:
-	sys.ps1="MinorbShell > "
-	print """minpath -- beginning at %s
+  global SharedToken, RemoteServer_porta
+  if REMOTE_MINORB:
+    print("setting up remote service...")
+    set_up_remote_service('lkl01')
+  # change interactively:
+  sys.ps1="MinorbShell > "
+  print("""minpath -- beginning at %s
 symfiles:
-""" % os.popen('date','r').read()
-	scan_files('.')
+""" % os.popen('date','r').read())
+  scan_files('.')
 
 
 

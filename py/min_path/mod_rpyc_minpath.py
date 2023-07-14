@@ -65,7 +65,10 @@ def connector_to_minorb(data, THIS_PATH):
     PP = subprocess.Popen(TODO_PATH, shell=True, bufsize=8192,
                           stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
     data = _strip_comments(data)
-    res, err = PP.communicate(input=data)
+    # print("in connector_to_minorb: ", data)
+    res, err = PP.communicate(input=bytes(data,'ascii'))
+    res, err = res.decode('ascii'), err.decode('ascii')
+    # print("in connector_to_minorb: ", res)
     sys.stderr.write(err)
     if len(res) < 4:
         sys.stderr.write("FATAL ERROR: minorb broken...\n")
